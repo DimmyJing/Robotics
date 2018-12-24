@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -23,6 +24,8 @@ public class MainTeleOp extends LinearOpMode {
     public DcMotor latchR;
     private Servo claiming;
     private Servo latchSecure;
+    private CRServo intakeL;
+    private CRServo intakeR;
     boolean latchSecureToggle = true;
     private ColorSensor color;
 
@@ -41,6 +44,8 @@ public class MainTeleOp extends LinearOpMode {
         claiming = hardwareMap.get(Servo.class, "claiming");
         latchSecure = hardwareMap.get(Servo.class , "latchingSecure");
         color = hardwareMap.get(ColorSensor.class, "colorSens");
+        intakeL = hardwareMap.get(CRServo.class, "leftRoller");
+        intakeR = hardwareMap.get(CRServo.class, "rightRoller");
         //latching = hardwareMap.get(DcMotor.class , "latching");
 
 
@@ -90,14 +95,14 @@ public class MainTeleOp extends LinearOpMode {
             if(gamepad2.x && !x_btn_hold) {
                 x_btn_hold = true;
                 latchSecureToggle = !latchSecureToggle;
-                sleep(150);
+                sleep(150);     //For the latch lock
             }
             else if (x_btn_hold)
                 x_btn_hold = false;
 
             if (gamepad2.y) {
                 latchL.setPower(-0.45);
-                latchR.setPower(0.45);
+                latchR.setPower(0.45);   //Holding the latchArm in position
             }
 
             if(latchSecureToggle) {
@@ -105,6 +110,18 @@ public class MainTeleOp extends LinearOpMode {
             }
             else {
                 latchSecure.setPosition(0.45);
+            }
+
+            if (gamepad2.a){
+                intakeR.setPower(1);
+                intakeL.setPower(-1);
+            }
+            else if (gamepad2.b){
+                intakeR.setPower(-1);
+                intakeL.setPower(1);   //Roller code
+            } else {
+                intakeR.setPower(0);
+                intakeL.setPower(0);
             }
         }
     }

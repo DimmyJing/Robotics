@@ -33,7 +33,7 @@ public class AutoLeftOp extends LinearOpMode {
 
     private int goldPosition = 0;
     boolean unlocked = true;
-
+/*
     public void turn_right(double speed, long time) {
         left_drive.setPower(speed * 0.25);
         right_drive.setPower(speed * -0.25);
@@ -41,9 +41,9 @@ public class AutoLeftOp extends LinearOpMode {
         left_drive.setPower(0);
         right_drive.setPower(0);
     }
+*/
 
-
-
+/*
     public void turn_left(double speed, long time) {
         left_drive.setPower(speed * -0.25);
         right_drive.setPower(speed * 0.25);
@@ -52,7 +52,7 @@ public class AutoLeftOp extends LinearOpMode {
         right_drive.setPower(0);
     }
 
-
+*/
     // todo: write your code here
     public void runOpMode() {
 
@@ -70,28 +70,31 @@ public class AutoLeftOp extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
+        /*
         left_drive = hardwareMap.get(DcMotor.class, "left_drive");
         right_drive = hardwareMap.get(DcMotor.class, "right_drive");
         claiming = hardwareMap.get(Servo.class, "claiming");
         latching = hardwareMap.get(DcMotor.class , "latching");
+        */
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
+        /*
         left_drive.setDirection(DcMotor.Direction.FORWARD);
         right_drive.setDirection(DcMotor.Direction.REVERSE);
         claiming.setPosition(0.1);
+        */
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        if(opModeIsActive()){
+        if (opModeIsActive()) {
 
             if (tfod != null) {
                 tfod.activate();
             }
 
-
-            while(opModeIsActive()){
+            while (opModeIsActive()) {
 
                 if (tfod != null) {
 
@@ -143,14 +146,14 @@ public class AutoLeftOp extends LinearOpMode {
 
                     if(goldPosition == 0){
 
-                        turn_left(0.25, 500);
+                        //turn_left(0.25, 500);
                         unlocked = false;
 
                     } else if(goldPosition == 1){
 
-                        right_drive.setPower(0.4);
+                       /* right_drive.setPower(0.4);
                         left_drive.setPower(0.4);
-
+                        */
                         unlocked = false;
                     } else if (goldPosition == 2){
 
