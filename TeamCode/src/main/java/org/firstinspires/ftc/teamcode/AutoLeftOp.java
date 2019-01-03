@@ -24,94 +24,32 @@ public class AutoLeftOp extends LinearOpMode {
     private Servo claiming;
 
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
-    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    private static final String LABEL_GOLD_MINERAL = "Gold";
+    private static final String LABEL_SILVER_MINERAL = "Silver";
 
     private static final String VUFORIA_KEY = "AVFqPUj/////AAABmUZq2lNDVkH3oO3zcUMuhFcPxlq7hd423wLEOcLpQlY5b/ASq1SQUZ3mrQoe0f1fsWJzB6Y8MtKD0qwvNR569fy85lgYP4C1A+0hfLtHK0LkzP4pDjQntey02WT7N3wLXjliJYqMxXPdSrxn2/+XMlNmjA7/FlrMP9UesjD5srMCKKy8ERG1NF6qK3B+Hbw+U6L10ojIaODz3YoOgurGyOHt3FXScmdhyeQYBCJrTSPWBDwlis9dYAVZgIvuKFsXKVYr8JUdWfkGLbt+11orICZb1MoYMop+3b6I/Pl2fx0urnUqYjgbGIDOaL7Atziss+A6sSgm9QCiyzHxrdk4oqUcCnvQ2oioyDWCNjcR9t4N";
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
 
     public void turn_left(double speed, long time) {
-        left_drive.setPower(speed * 0.3);
-        right_drive.setPower(speed * -0.3);
+        left_drive.setPower(speed);
+        right_drive.setPower(-speed);
         sleep(time);
         left_drive.setPower(0);
         right_drive.setPower(0);
     }
-
 
     public void turn_right(double speed, long time) {
-        left_drive.setPower(speed * -0.3);
-        right_drive.setPower(speed * 0.3);
+        left_drive.setPower(-speed);
+        right_drive.setPower(speed);
         sleep(time);
         left_drive.setPower(0);
         right_drive.setPower(0);
-    }
-
-
-    public void move_forward_rev(double revs, double power) {
-        right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        left_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        right_drive.setTargetPosition((int)(-244 * revs));
-        left_drive.setTargetPosition((int)(-244 * revs));
-
-        right_drive.setPower(power);
-        left_drive.setPower(power);
-
-        while((right_drive.isBusy())||(left_drive.isBusy())){}
-        right_drive.setPower(0);
-        left_drive.setPower(0);
-
-        right_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    public void turn_right_rev(double revs, double power) {
-        right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        left_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        right_drive.setTargetPosition((int)(244 * revs));
-        left_drive.setTargetPosition((int)(-244 * revs));
-
-        right_drive.setPower(-power);
-        left_drive.setPower(power);
-
-        while((right_drive.isBusy())||(left_drive.isBusy())){}
-        right_drive.setPower(0);
-        left_drive.setPower(0);
-
-        right_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    public void turn_left_rev(double revs, double power) {
-        right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        left_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        right_drive.setTargetPosition((int)(-244 * revs));
-        left_drive.setTargetPosition((int)(244 * revs));
-
-        right_drive.setPower(power);
-        left_drive.setPower(-power);
-
-        while((right_drive.isBusy())||(left_drive.isBusy())){}
-        right_drive.setPower(0);
-        left_drive.setPower(0);
-
-        right_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void move_forward(double power, long time) {
-        right_drive.setPower(power);
-        left_drive.setPower(power);
+        right_drive.setPower(-power);
+        left_drive.setPower(-power);
         sleep(time);
         right_drive.setPower(0);
         left_drive.setPower(0);
@@ -129,7 +67,6 @@ public class AutoLeftOp extends LinearOpMode {
         // Initialize claiming
         claiming.setPosition(0);
         sleep(900);
-        // Lower latching arm
         latchingLeft.setPower(0.2);
         latchingRight.setPower(-0.2);
         sleep(100);
@@ -138,6 +75,7 @@ public class AutoLeftOp extends LinearOpMode {
         // Lock latch arm
         latchLock.setPosition(0.45);
         // Wiggle Out
+        move_forward(-0.2, 100);
         right_drive.setPower(-0.3);
         sleep(500);
         left_drive.setPower(0.2);
@@ -160,18 +98,16 @@ public class AutoLeftOp extends LinearOpMode {
         left_drive.setPower(0);
     }
 
-    public void initialize() {
-        right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        left_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right_drive.setPower(0.8);
-        left_drive.setPower(0.8);
-        while((right_drive.isBusy())||(left_drive.isBusy())){}
-        right_drive.setPower(0);
-        left_drive.setPower(0);
-        right_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public boolean isGold() {
+        while (true) {
+            List<Recognition> updatedRecognition = tfod.getUpdatedRecognitions();
+            if (updatedRecognition != null)
+                for (Recognition rec : updatedRecognition)
+                    if (rec.getLabel().equals("Gold"))
+                        return true;
+                    else
+                        return false;
+        }
     }
 
     public void runOpMode() {
@@ -204,25 +140,30 @@ public class AutoLeftOp extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        if (opModeIsActive()) {
-            if (tfod != null) {
-                tfod.activate();
-            }
-            unlatch();
+        if (tfod != null) {
+            tfod.activate();
         }
-        while (opModeIsActive()) {
-            if (tfod != null) {
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData("Type:", recognition.getLabel());
-                        telemetry.addData("Left:", recognition.getLeft());
-                    }
-                    telemetry.update();
+        if (opModeIsActive()) {
+            unlatch();
+            move_forward(-0.8, 650);
+            turn_right(0.8, 640);
+            int goldPlace = -1;
+            if (isGold()) {
+                goldPlace = 0;
+            }
+            else {
+                turn_right(0.8, 160);
+                sleep(400);
+                if (isGold()) {
+                    goldPlace = 1;
+                }
+                else {
+                    turn_right(0.8, 160);
+                    goldPlace = 2;
                 }
             }
         }
+        move_forward(1, 1000);
         if(tfod != null){
             tfod.shutdown();
         }
@@ -244,4 +185,3 @@ public class AutoLeftOp extends LinearOpMode {
     }
 
 }
-
