@@ -31,6 +31,66 @@ public class AutoLeftOp extends LinearOpMode {
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
 
+    public void move_forward_rev(double revs, double power) {
+        right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        left_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        right_drive.setTargetPosition((int)(-244 * revs));
+        left_drive.setTargetPosition((int)(-244 * revs));
+
+        right_drive.setPower(power);
+        left_drive.setPower(power);
+
+        while((right_drive.isBusy())||(left_drive.isBusy())){}
+        right_drive.setPower(0);
+        left_drive.setPower(0);
+
+        right_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void turn_right_rev(double revs, double power) {
+        right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        left_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        right_drive.setTargetPosition((int)(244 * revs));
+        left_drive.setTargetPosition((int)(-244 * revs));
+
+        right_drive.setPower(-power);
+        left_drive.setPower(power);
+
+        while((right_drive.isBusy())||(left_drive.isBusy())){}
+        right_drive.setPower(0);
+        left_drive.setPower(0);
+
+        right_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void turn_left_rev(double revs, double power) {
+        right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        left_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        right_drive.setTargetPosition((int)(-244 * revs));
+        left_drive.setTargetPosition((int)(244 * revs));
+
+        right_drive.setPower(power);
+        left_drive.setPower(-power);
+
+        while((right_drive.isBusy())||(left_drive.isBusy())){}
+        right_drive.setPower(0);
+        left_drive.setPower(0);
+
+        right_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     public void turn_left(double speed, long time) {
         left_drive.setPower(speed);
         right_drive.setPower(-speed);
@@ -59,43 +119,22 @@ public class AutoLeftOp extends LinearOpMode {
         // Move the latch lock out
         latchingLeft.setPower(-0.35);
         latchingRight.setPower(0.35);
-        sleep(100);
-        latchLock.setPosition(0.45);
-        sleep(700);
-        latchingLeft.setPower(-0.04);     //LANDING WORKS
-        latchingRight.setPower(0.04);
-        // Initialize claiming
-        claiming.setPosition(0);
-        sleep(900);
-        latchingLeft.setPower(0.2);
-        latchingRight.setPower(-0.2);
-        sleep(100);
-        latchingLeft.setPower(0);
-        latchingRight.setPower(0);
-        // Lock latch arm
-        latchLock.setPosition(0.45);
-        // Wiggle Out
-        move_forward(-0.2, 100);
-        right_drive.setPower(-0.3);
-        sleep(500);
-        left_drive.setPower(0.2);
-        sleep(1000);
-        left_drive.setPower(0);
-        right_drive.setPower(0);
-        latchingRight.setPower(0.4);
-        latchingLeft.setPower(-0.4);
-        sleep(450);
-        latchingRight.setPower(0);
-        latchingLeft.setPower(0);
-        claiming.setPosition(0);
+        latchLock.setPosition(0.4);
+        sleep(800);
+        latchingLeft.setPower(-0.02);
+        latchingRight.setPower(0.02);
+        sleep(800);
+        latchingLeft.setPower(0.1);
+        latchingRight.setPower(-0.1);
         sleep(400);
-        // Adjust position
-        right_drive.setPower(0.2);
-        sleep(500);
-        left_drive.setPower(-0.35);
-        sleep(735);
-        right_drive.setPower(0);
-        left_drive.setPower(0);
+        turn_left_rev(0.3, 1);
+        latchingLeft.setPower(-0.8);
+        latchingRight.setPower(0.8);
+        sleep(330);
+        latchingLeft.setPower(0);
+        latchingRight.setPower(0);
+        latchLock.setPosition(0.6);
+        /*claiming.setPosition(0);*/
     }
 
     public boolean isGold() {
@@ -108,6 +147,33 @@ public class AutoLeftOp extends LinearOpMode {
                     else
                         return false;
         }
+    }
+
+    public void first_path() {
+        move_forward_rev(3, 1);
+        turn_right_rev(0.8, 1);
+        move_forward_rev(2.7, 1);
+        sleep(1000);
+        move_forward_rev(-7.7, 1);
+    }
+
+    public void second_path() {
+        move_forward_rev(4, 1);
+        turn_left_rev(0.5, 1);
+        move_forward_rev(0.6, 1);
+        turn_right_rev(0.9, 1);
+        sleep(1000);
+        move_forward_rev(-7, 1);
+    }
+
+    public void third_path() {
+        move_forward_rev(3, 1);
+        turn_left_rev(1, 1);
+        move_forward_rev(3, 1);
+        turn_right_rev(1, 1);
+        move_forward_rev(0.5, 1);
+        sleep(1000);
+        move_forward_rev(-7.5, 1);
     }
 
     public void runOpMode() {
@@ -130,11 +196,9 @@ public class AutoLeftOp extends LinearOpMode {
         latchLock = hardwareMap.get(Servo.class, "latchingSecure");
         left_drive.setDirection(DcMotor.Direction.REVERSE);
         right_drive.setDirection(DcMotor.Direction.FORWARD);
+        left_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        left_drive.setDirection(DcMotor.Direction.REVERSE);
-        right_drive.setDirection(DcMotor.Direction.FORWARD);
         claiming.setPosition(0.1);
 
         // Wait for the game to start (driver presses PLAY)
@@ -145,25 +209,35 @@ public class AutoLeftOp extends LinearOpMode {
         }
         if (opModeIsActive()) {
             unlatch();
-            move_forward(-0.8, 650);
-            turn_right(0.8, 640);
+            move_forward_rev(-1, 1);
+            turn_right_rev(2, 1);
             int goldPlace = -1;
-            if (isGold()) {
+            if (/*isGold()*/true) {
                 goldPlace = 0;
             }
             else {
-                turn_right(0.8, 160);
+                turn_right_rev(0.5, 1);
                 sleep(400);
                 if (isGold()) {
                     goldPlace = 1;
                 }
                 else {
-                    turn_right(0.8, 160);
+                    turn_right_rev(0.4, 1);
                     goldPlace = 2;
                 }
             }
+            switch(goldPlace) {
+                case 0:
+                    first_path();
+                    break;
+                case 1:
+                    second_path();
+                    break;
+                case 2:
+                    third_path();
+                    break;
+            }
         }
-        move_forward(1, 1000);
         if(tfod != null){
             tfod.shutdown();
         }
