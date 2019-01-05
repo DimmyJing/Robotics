@@ -150,8 +150,8 @@ public class AutoLeftOp extends LinearOpMode {
     }
 
     public void first_path() {
-        move_forward_rev(3, 1);
-        turn_right_rev(0.8, 1);
+        move_forward_rev(2.6, 1);
+        turn_right_rev(0.9, 1);
         move_forward_rev(2.7, 1);
         sleep(1000);
         move_forward_rev(-7.7, 1);
@@ -212,7 +212,7 @@ public class AutoLeftOp extends LinearOpMode {
             move_forward_rev(-1, 1);
             turn_right_rev(2, 1);
             int goldPlace = -1;
-            if (/*isGold()*/true) {
+            if (isGold()) {
                 goldPlace = 0;
             }
             else {
