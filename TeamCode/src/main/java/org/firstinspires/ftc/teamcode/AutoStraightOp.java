@@ -15,11 +15,11 @@ import java.util.List;
 @Autonomous (name = "AutoStraightOp", group= "Linear Opmode")
 
 public class AutoStraightOp extends LinearOpMode {
-    public DcMotor left_drive;
-    public DcMotor right_drive;
-    public DcMotor latchingLeft;
-    public DcMotor latchingRight;
-    public Servo latchLock;
+    private DcMotor left_drive;
+    private DcMotor right_drive;
+    private DcMotor latchingLeft;
+    private DcMotor latchingRight;
+    private Servo latchLock;
 
     private Servo claiming;
 
@@ -31,7 +31,7 @@ public class AutoStraightOp extends LinearOpMode {
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
 
-    public void move_forward_rev(double revs, double power) {
+    private void move_forward_rev(double revs, double power) {
         right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -51,7 +51,7 @@ public class AutoStraightOp extends LinearOpMode {
         left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void turn_right_rev(double revs, double power) {
+    private void turn_right_rev(double revs, double power) {
         right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -71,7 +71,7 @@ public class AutoStraightOp extends LinearOpMode {
         left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void turn_left_rev(double revs, double power) {
+    private void turn_left_rev(double revs, double power) {
         right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -91,31 +91,7 @@ public class AutoStraightOp extends LinearOpMode {
         left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void turn_left(double speed, long time) {
-        left_drive.setPower(speed);
-        right_drive.setPower(-speed);
-        sleep(time);
-        left_drive.setPower(0);
-        right_drive.setPower(0);
-    }
-
-    public void turn_right(double speed, long time) {
-        left_drive.setPower(-speed);
-        right_drive.setPower(speed);
-        sleep(time);
-        left_drive.setPower(0);
-        right_drive.setPower(0);
-    }
-
-    public void move_forward(double power, long time) {
-        right_drive.setPower(-power);
-        left_drive.setPower(-power);
-        sleep(time);
-        right_drive.setPower(0);
-        left_drive.setPower(0);
-    }
-
-    public void unlatch() {
+    private void unlatch() {
         // Move the latch lock out
         latchingLeft.setPower(-0.35);
         latchingRight.setPower(0.35);
@@ -123,6 +99,7 @@ public class AutoStraightOp extends LinearOpMode {
         sleep(800);
         latchingLeft.setPower(-0.02);
         latchingRight.setPower(0.02);
+        claiming.setPosition(0.1);
         sleep(800);
         latchingLeft.setPower(0.1);
         latchingRight.setPower(-0.1);
@@ -134,10 +111,9 @@ public class AutoStraightOp extends LinearOpMode {
         latchingLeft.setPower(0);
         latchingRight.setPower(0);
         latchLock.setPosition(0.6);
-        /*claiming.setPosition(0);*/
     }
 
-    public boolean isGold() {
+    private boolean isGold() {
         while (true) {
             List<Recognition> updatedRecognition = tfod.getUpdatedRecognitions();
             if (updatedRecognition != null)
@@ -149,45 +125,56 @@ public class AutoStraightOp extends LinearOpMode {
         }
     }
 
-    public void first_path() {
+    private void first_path() {
         move_forward_rev(3, 1);
-        turn_right_rev(0.8, 1);
-        move_forward_rev(2.7, 1);
+        /*
+        move_forward_rev(2.6, 1);
+        turn_right_rev(0.9, 1);
+        move_forward_rev(3.0, 1);
+        claiming.setPosition(0.5);
         sleep(1000);
-        move_forward_rev(-7.7, 1);
+        move_forward_rev(-8.0, 1);
+        */
     }
 
-    public void second_path() {
+    private void second_path() {
+        move_forward_rev(3, 1);
+        /*
         move_forward_rev(4, 1);
+        sleep(100);
         turn_left_rev(0.5, 1);
-        move_forward_rev(0.6, 1);
-        turn_right_rev(0.9, 1);
+        sleep(100);
+        move_forward_rev(0.8, 1);
+        sleep(100);
+        turn_right_rev(0.87, 1);
+        claiming.setPosition(0.5);
         sleep(1000);
         move_forward_rev(-7, 1);
+        */
     }
 
-    public void third_path() {
+    private void third_path() {
+        move_forward_rev(3, 1);
+        /*
         move_forward_rev(3, 1);
         turn_left_rev(1, 1);
-        move_forward_rev(3, 1);
+        move_forward_rev(3.2, 1);
         turn_right_rev(1, 1);
-        move_forward_rev(0.5, 1);
+        move_forward_rev(0.6, 1);
+        claiming.setPosition(0.5);
         sleep(1000);
-        move_forward_rev(-7.5, 1);
+        move_forward_rev(-7.6, 1);
+        */
     }
 
     public void runOpMode() {
         initVuforia();
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+        if (ClassFactory.getInstance().canCreateTFObjectDetector())
             initTfod();
-        }
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
         left_drive = hardwareMap.get(DcMotor.class, "left_drive");
         right_drive = hardwareMap.get(DcMotor.class, "right_drive");
         latchingLeft = hardwareMap.get(DcMotor.class, "latchLeft");
@@ -199,28 +186,24 @@ public class AutoStraightOp extends LinearOpMode {
         left_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        claiming.setPosition(0.1);
+        claiming.setPosition(0.3);
 
-        // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        if (tfod != null) {
+        if (tfod != null)
             tfod.activate();
-        }
         if (opModeIsActive()) {
             unlatch();
             move_forward_rev(-1, 1);
             turn_right_rev(2, 1);
             int goldPlace = -1;
-            if (/*isGold()*/true) {
+            if (isGold())
                 goldPlace = 0;
-            }
             else {
                 turn_right_rev(0.5, 1);
-                sleep(400);
-                if (isGold()) {
+                sleep(800);
+                if (isGold())
                     goldPlace = 1;
-                }
                 else {
                     turn_right_rev(0.4, 1);
                     goldPlace = 2;
@@ -238,9 +221,8 @@ public class AutoStraightOp extends LinearOpMode {
                     break;
             }
         }
-        if(tfod != null){
+        if(tfod != null)
             tfod.shutdown();
-        }
     }
 
     private void initVuforia() {

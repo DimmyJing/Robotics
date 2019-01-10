@@ -27,7 +27,6 @@ public class MainTeleOp extends LinearOpMode {
     private CRServo intakeL;
     private CRServo intakeR;
     boolean latchSecureToggle = true;
-    private ColorSensor color;
 
     @Override
     public void runOpMode() {
@@ -43,7 +42,6 @@ public class MainTeleOp extends LinearOpMode {
         latchR = hardwareMap.get(DcMotor.class , "latchRight");
         claiming = hardwareMap.get(Servo.class, "claiming");
         latchSecure = hardwareMap.get(Servo.class , "latchingSecure");
-        color = hardwareMap.get(ColorSensor.class, "colorSens");
         intakeL = hardwareMap.get(CRServo.class, "leftRoller");
         intakeR = hardwareMap.get(CRServo.class, "rightRoller");
         //latching = hardwareMap.get(DcMotor.class , "latching");
@@ -85,9 +83,6 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("Status", "Left Stick: " + gamepad1.left_stick_y);
             telemetry.addData("Status", "Right Stick: " + gamepad1.right_stick_y);
             telemetry.addData("latched ", latchSecureToggle);
-            telemetry.addData("Red: ", color.red());
-            telemetry.addData("Green: ", color.green());
-            telemetry.addData("Blue: ", color.blue());
 
 
             telemetry.update();
