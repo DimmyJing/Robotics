@@ -12,14 +12,14 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import java.util.List;
 
 
-@Autonomous (name = "AutoLeftOp", group= "Linear Opmode")
+@Autonomous (name = "CratorClaimOp", group= "Linear Opmode")
 
-public class AutoLeftOp extends LinearOpMode {
-    private DcMotor left_drive;
-    private DcMotor right_drive;
-    private DcMotor latchingLeft;
-    private DcMotor latchingRight;
-    private Servo latchLock;
+public class CratorClaimOp extends LinearOpMode {
+    public DcMotor left_drive;
+    public DcMotor right_drive;
+    public DcMotor latchingLeft;
+    public DcMotor latchingRight;
+    public Servo latchLock;
 
     private Servo claiming;
 
@@ -31,7 +31,7 @@ public class AutoLeftOp extends LinearOpMode {
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
 
-    private void move_forward_rev(double revs, double power) {
+    public void move_forward_rev(double revs, double power) {
         right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -51,7 +51,7 @@ public class AutoLeftOp extends LinearOpMode {
         left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    private void turn_right_rev(double revs, double power) {
+    public void turn_right_rev(double revs, double power) {
         right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -71,7 +71,7 @@ public class AutoLeftOp extends LinearOpMode {
         left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    private void turn_left_rev(double revs, double power) {
+    public void turn_left_rev(double revs, double power) {
         right_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -91,7 +91,31 @@ public class AutoLeftOp extends LinearOpMode {
         left_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    private void unlatch() {
+    public void turn_left(double speed, long time) {
+        left_drive.setPower(speed);
+        right_drive.setPower(-speed);
+        sleep(time);
+        left_drive.setPower(0);
+        right_drive.setPower(0);
+    }
+
+    public void turn_right(double speed, long time) {
+        left_drive.setPower(-speed);
+        right_drive.setPower(speed);
+        sleep(time);
+        left_drive.setPower(0);
+        right_drive.setPower(0);
+    }
+
+    public void move_forward(double power, long time) {
+        right_drive.setPower(-power);
+        left_drive.setPower(-power);
+        sleep(time);
+        right_drive.setPower(0);
+        left_drive.setPower(0);
+    }
+
+    public void unlatch() {
         // Move the latch lock out
         latchingLeft.setPower(-0.35);
         latchingRight.setPower(0.35);
@@ -99,21 +123,22 @@ public class AutoLeftOp extends LinearOpMode {
         sleep(800);
         latchingLeft.setPower(-0.02);
         latchingRight.setPower(0.02);
-        claiming.setPosition(0.1);
         sleep(800);
         latchingLeft.setPower(0.1);
         latchingRight.setPower(-0.1);
         sleep(400);
-        turn_left_rev(0.3, 1);
+        turn_left_rev(0.3, 0.8);
         latchingLeft.setPower(-0.8);
         latchingRight.setPower(0.8);
         sleep(330);
         latchingLeft.setPower(0);
         latchingRight.setPower(0);
         latchLock.setPosition(0.6);
+        turn_right_rev(0.28, 0.8);
+        /*claiming.setPosition(0);*/
     }
 
-    private boolean isGold() {
+    public boolean isGold() {
         while (true) {
             List<Recognition> updatedRecognition = tfod.getUpdatedRecognitions();
             if (updatedRecognition != null)
@@ -125,56 +150,71 @@ public class AutoLeftOp extends LinearOpMode {
         }
     }
 
-    private void first_path() {
-        move_forward_rev(2.6, 1);
-        turn_right_rev(0.9, 1);
-        move_forward_rev(3.0, 1);
-        claiming.setPosition(0.5);
-        sleep(1000);
-        move_forward_rev(-8.0, 1);
-        right_drive.setPower(1);
-        sleep(500);
-        right_drive.setPower(0);
+    public void first_path() {
+        move_forward_rev(1.82, 1);
+        move_forward_rev(-1.82, -1);
+        turn_right_rev(1.4, 0.8);
+        move_forward_rev(3.8, 1);
+        turn_left_rev(1.35, 0.8);
+        move_forward_rev(-3, 1);
+        turn_right_rev(0.5, 0.8);
+        move_forward_rev(-1, 1);
+        turn_left_rev(2, 0.8);
+        claim();
+
     }
 
-    private void second_path() {
-        move_forward_rev(4, 1);
-        sleep(100);
-        turn_left_rev(0.5, 1);
-        sleep(100);
-        move_forward_rev(0.8, 1);
-        sleep(100);
-        turn_right_rev(0.87, 1);
-        claiming.setPosition(0.5);
-        sleep(1000);
-        move_forward_rev(-7, 1);
-        right_drive.setPower(1);
-        sleep(500);
-        right_drive.setPower(0);
+    public void second_path() {
+        move_forward_rev(1.4, 1);
+        move_forward_rev(-1.4, -1);
+        turn_right_rev(0.8, 0.8);
+        move_forward_rev(3.72, 1);
+        turn_left_rev(1.4, 0.8);
+        move_forward_rev(-3, 1);
+        turn_right_rev(0.5, 0.8);
+        move_forward_rev(-1, 1);
+        turn_left_rev(2, 0.8);
+        claim();
+
     }
 
-    private void third_path() {
-        move_forward_rev(3, 1);
-        turn_left_rev(1, 1);
-        move_forward_rev(3.2, 1);
-        turn_right_rev(1, 1);
-        move_forward_rev(0.6, 1);
-        claiming.setPosition(0.5);
-        sleep(1000);
-        move_forward_rev(-7.6, 1);
-        right_drive.setPower(1);
+    public void third_path() {
+        move_forward_rev(1.8, 1);
+        move_forward_rev(-1.8, -1);
+        turn_right_rev(0.3, 0.8);
+        move_forward_rev(3.72, 1);
+        turn_left_rev(1.35, 0.8);
+        move_forward_rev(-3, 1);
+        turn_right_rev(0.5, 0.8);
+        move_forward_rev(-1, 1);
+        turn_left_rev(2, 0.8);
+        claim();
+
+    }
+
+    public void claim(){
+        claiming.setPosition(0);
         sleep(500);
-        right_drive.setPower(0);
+        claiming.setPosition(0.4);
+        sleep(500);
+        claiming.setPosition(0);
+        sleep(500);
+        claiming.setPosition(0.4);
+        sleep(500);
     }
 
     public void runOpMode() {
         initVuforia();
-        if (ClassFactory.getInstance().canCreateTFObjectDetector())
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod();
+        }
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
         left_drive = hardwareMap.get(DcMotor.class, "left_drive");
         right_drive = hardwareMap.get(DcMotor.class, "right_drive");
         latchingLeft = hardwareMap.get(DcMotor.class, "latchLeft");
@@ -186,43 +226,51 @@ public class AutoLeftOp extends LinearOpMode {
         left_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        claiming.setPosition(0.3);
+        claiming.setPosition(0.1);
 
+        // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        if (tfod != null)
+        if (tfod != null) {
             tfod.activate();
+        }
         if (opModeIsActive()) {
             unlatch();
-            move_forward_rev(-1, 1);
-            turn_right_rev(2, 1);
+            move_forward_rev(-1.1, 0.6);
+            turn_right_rev(1.5, 0.8);
             int goldPlace = -1;
-            if (isGold())
+
+            if (isGold()) {
                 goldPlace = 0;
+            }
             else {
-                turn_right_rev(0.5, 1);
-                sleep(800);
-                if (isGold())
+                turn_right_rev(0.6, 0.8);
+                sleep(200);
+                if (isGold()) {
                     goldPlace = 1;
+                }
                 else {
-                    turn_right_rev(0.4, 1);
+                    turn_right_rev(0.5, 0.8);
                     goldPlace = 2;
                 }
             }
+
             switch(goldPlace) {
                 case 0:
-                    first_path();
+                    first_path(); //Left
                     break;
                 case 1:
-                    second_path();
+                    second_path(); //Center
                     break;
                 case 2:
-                    third_path();
+                    third_path(); // Right
                     break;
             }
         }
-        if(tfod != null)
+        if(tfod != null){
             tfod.shutdown();
+        }
+
     }
 
     private void initVuforia() {
