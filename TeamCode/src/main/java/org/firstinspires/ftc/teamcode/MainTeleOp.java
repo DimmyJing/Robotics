@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+@Disabled
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
 
 public class MainTeleOp extends LinearOpMode {
