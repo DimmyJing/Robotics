@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import java.util.List;
 
 @Disabled
-@Autonomous (name = "CratorClaimOp", group= "Linear Opmode")
+@Autonomous (name = "CratorClaimOp", group = "Linear Opmode")
 
 public class CratorClaimOp extends LinearOpMode {
     public DcMotor left_drive;
@@ -190,7 +190,6 @@ public class CratorClaimOp extends LinearOpMode {
         move_forward_rev(-1, 1);
         turn_left_rev(2, 0.8);
         claim();
-
     }
 
     public void claim(){
