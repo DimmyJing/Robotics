@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.util.Range;
 class MainTeleOp extends LinearOpMode{
 
   private DCMotor FL, FR, BL, BR;
-  Gamepad g1, g2;
+  private Gamepad g1, g2;
 
 
   public void runOpMode(){
