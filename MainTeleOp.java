@@ -62,16 +62,11 @@ public class MainTeleOp extends LinearOpMode{
         lastPwrCnt = pwrToggleCnt;
       }
 
-      if(g1.right_trigger > 0 && g1.left_trigger == 0){
-        FL.setPower(g1.right_trigger);
-        BL.setPower(g1.right_trigger);
-        FR.setPower(g1.right_trigger);
-        BR.setPower(g1.right_trigger);
-      } else if (g1.right_trigger == 0 && g1.left_trigger > 0){
-        FL.setPower(-g1.left_trigger);
-        BL.setPower(-g1.left_trigger);
-        FR.setPower(-g1.left_trigger);
-        BR.setPower(-g1.left_trigger);
+      if(g1.right_trigger > 0 || g1.left_trigger > 0){
+        FL.setPower(g1.right_trigger - g1.left_trigger);
+        BL.setPower(g1.right_trigger - g1.left_trigger);
+        FR.setPower(g1.right_trigger - g1.left_trigger);
+        BR.setPower(g1.right_trigger - g1.left_trigger);
       } else {
 
         if(!precise){
