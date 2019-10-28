@@ -22,11 +22,13 @@ public class MainTeleOp extends LinearOpMode{
   private DcMotor FL, FR, BL, BR;
   private Gamepad g1, g2;
   private int pwrToggleCnt = 0;
-  private int lastPwrCnt = 0;
+  private int servoCnt = 0;
+
   private boolean precise = false;
+  private boolean servoDn = false;
 
   private Servo swingL, swingR;
-
+  private double[] in = {0,0};
 
   public void runOpMode(){
 
@@ -40,13 +42,51 @@ public class MainTeleOp extends LinearOpMode{
 
     g1 = gamepad1;
     g2 = gamepad2;
-    double[] in = {0,0};
 
 
     waitForStart();
 
     while(opModeIsActive()){
-      //Divide by 4.15 because sin(x) + cos(x) has a max of +/-4.15. Want to scale down max power to +/-1.
+
+      normalOps(); // need seperate method to continue normal functions in embedded while loops
+      /*
+      while(gamepad1.right_stick_y != 0){
+      normalOps();
+      pivotMotor.setPower(gamepad1.right_stick_y);
+      pivoted = true;
+
+      }
+
+      if(pivoted){
+          int dtheta = encoderticks;
+          articulating.setTargetPosition(-detheta? * revRatio);
+          articulating.setPower((dtheta/abs(dtheta)) * 0.2);
+          boolean interrupted = false;
+          while(articulating.isBusy()){
+            normalOps();
+            if(gamepad1.right_stick_y != 0){
+            interrupted = true;
+            articulating.setPower(0);
+            break;
+          }
+        }
+        if(!interrupted){
+        articulating.setPower(0);
+        pivotMotor.resetEncoder();
+        articulating.resetEncoder();
+      }
+      }
+
+      */
+      telemetry.addData("pwrToggle: ", precise);
+      telemetry.addData("g1 stats: ", Arrays.toString(in));
+      telemetry.update();
+
+
+    }
+    }
+
+    public void normalOps(){
       in[0] = g1.left_stick_x;
       in[1] = g1.left_stick_y;
 
@@ -57,9 +97,9 @@ public class MainTeleOp extends LinearOpMode{
         }
       } else {
 
-      if(pwrToggleCnt != lastPwrCnt){
+      if(pwrToggleCnt != 0){
         precise = !precise;
-        lastPwrCnt = pwrToggleCnt;
+        pwrToggleCnt = 0;
       }
 
       if(g1.right_trigger > 0 || g1.left_trigger > 0){
@@ -70,34 +110,40 @@ public class MainTeleOp extends LinearOpMode{
       } else {
 
         if(!precise){
+        //Fast mode
         FL.setPower(in[0] - in[1]);
         FR.setPower((in[0] + in[1]));
         BL.setPower((-in[0] - in[1]));
         BR.setPower((-in[0] + in[1]));
         } else {
+        //Precise mode
         FL.setPower((in[0] - in[1])/4);
         FR.setPower((in[0] + in[1])/4);
         BL.setPower((-in[0] - in[1])/4);
         BR.setPower((-in[0] + in[1])/4);
         }
       }
+    }
+    if(g2.left_bumper) {
+      servoCnt++;
+      if(servoCnt > 150){
+        servoCnt = 0;
+      }
+    } else {
 
-      if(g1.left_bumper){
+      if(servoCnt != 0){
+        servoDn = !servoDn;
+        servoCnt = 0;
+      }
+
+      if(servoDn){
         swingL.setPosition(1);
         swingR.setPosition(0.8);
       } else {
         swingL.setPosition(0);
         swingR.setPosition(0);
       }
-
-      telemetry.addData("pwrToggle: ", precise);
-      telemetry.addData("g1 stats: ", Arrays.toString(in));
-      telemetry.update();
-
-
     }
-    }
-
 
   }
 
