@@ -89,9 +89,11 @@ public class MainTeleOp extends LinearOpMode {
             normalOps();
             extension.setPower(-gamepad2.right_stick_y/2);
 
+            if(!gamepad2.a){
+            //WHEN A IS BEING HELD, DO NOT UPDATE POWER - HOLD @ WHATEVER WAS LAST ASSIGNED
             pivoR.setPower(-gamepad2.left_stick_y);
             pivoL.setPower(gamepad2.left_stick_y);
-
+          }
         }
     }
 

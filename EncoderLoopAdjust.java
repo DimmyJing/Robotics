@@ -45,7 +45,9 @@ public class MainTeleOp extends LinearOpMode {
     private Servo swingL, swingR, stoneL, stoneR;
     private double[] in = {0,0};
 
-
+    private boolean engaged = false;
+    private int holdPos;
+    private final int POW_ADJ_SCALE = 0.05;
 
     public MainTeleOp() {
         powerToggle = new ToggleVal();
@@ -89,8 +91,24 @@ public class MainTeleOp extends LinearOpMode {
             normalOps();
             extension.setPower(-gamepad2.right_stick_y/2);
 
-            pivoR.setPower(-gamepad2.left_stick_y);
-            pivoL.setPower(gamepad2.left_stick_y);
+
+            if(autoHoldToggle.update(gamepad2.left_bumper)){
+
+              if(!engaged){
+                holdPos = pivoR.getCurrentPosition();
+                engaged = true;
+              } else {
+                 //CONTROL TO HOLD ARM CLOSE TO DESIRED POSITION
+                  int dif = holdPos - pivoR.getCurrentPosition(); //May need to adjust this based off how encoder values change -- if up is negative, do (currPosition - holdPos)
+                  pivoL.setPower(dif * POW_ADJ_SCALE);
+                  pivoR.setPower(-dif * POW_ADJ_SCALE);
+              }
+            } else {
+              engaged = false;
+
+              pivoL.setPower(gamepad2.left_stick_y);
+              pivoR.setPower(-gamepad2.left_stick_y);
+            }
 
         }
     }
