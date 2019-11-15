@@ -14,9 +14,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import java.util.Arrays;
 
-@TeleOp(name="MainTeleOp", group="Linear Opmode")
+@TeleOp(name="GpTest", group="Linear Opmode")
 
-public class MainTeleOp extends LinearOpMode {
+public class GpTest extends LinearOpMode {
     private class ToggleVal {
         private boolean prevState;
         private boolean state;
@@ -39,18 +39,19 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     private DcMotor FL, FR, BL, BR, pivoL, pivoR, extension, articulating;
-    private ToggleVal powerToggle, servoToggle, autoHoldToggle;
+    private ToggleVal powerToggle, servoToggle, stoneToggle;
     private boolean autoadjust = true;
+    private int refPos, refPosArtic;
 
     private Servo swingL, swingR, stoneL, stoneR;
     private double[] in = {0,0};
 
 
 
-    public MainTeleOp() {
+    public GpTest() {
         powerToggle = new ToggleVal();
         servoToggle = new ToggleVal();
-        autoHoldToggle = new ToggleVal();
+        stoneToggle = new ToggleVal();
     }
 
     public void runOpMode() {
@@ -76,12 +77,17 @@ public class MainTeleOp extends LinearOpMode {
 
         telemetry.addData("Welcome Drivers. Operate me Well", null);
         pivoR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pivoR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivoL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        articulating.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         pivoL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pivoR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        telemetry.update();
+        articulating.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        telemetry.update();
+        refPos = pivoR.getCurrentPosition() - 20;
+        refPosArtic = articulating.getCurrentPosition() - 100;
         waitForStart();
 
         while(opModeIsActive()){
@@ -89,10 +95,48 @@ public class MainTeleOp extends LinearOpMode {
             normalOps();
             extension.setPower(-gamepad2.right_stick_y/2);
 
-            if(!gamepad2.a){
+            //FLATTEN OUT ARTICULATING JOINT (currently too jitterry)
+            articulating.setPower(maxabs((refPosArtic + (int)((pivoR.getCurrentPosition() - refPos) * 288/2240) - articulating.getCurrentPosition())/25, 0.4));
+
+
+            telemetry.addData("Encoder pos pivo", pivoR.getCurrentPosition());
+            telemetry.addData("Encoder pos artic", articulating.getCurrentPosition());
+            if(!gamepad1.x){
+            boolean motionAllowed = false;
             //WHEN A IS BEING HELD, DO NOT UPDATE POWER - HOLD @ WHATEVER WAS LAST ASSIGNED
-            pivoR.setPower(-gamepad2.left_stick_y);
-            pivoL.setPower(gamepad2.left_stick_y);
+            if(pivoR.getCurrentPosition() < (refPos - 500)){
+                if(gamepad1.right_stick_y < 0){
+                    motionAllowed = true;
+                }
+            } else if (pivoR.getCurrentPosition() > refPos){
+                if(gamepad1.right_stick_y > 0){
+                    motionAllowed = true;
+                }
+            } else {
+                motionAllowed = true;
+            }
+            if(motionAllowed){
+            pivoR.setPower(-gamepad1.right_stick_y/2.8);
+            pivoL.setPower(gamepad1.right_stick_y/2.8);
+            } else {
+                pivoR.setPower(0);
+                pivoL.setPower(0);
+            }
+          } else {
+              //CODE TO CONFORM TO WHATEVER INITIAL POSITION IS
+              // GET INITIAL POSITION ONCE, IF ENCODER GOES BELOW THEN INCREMENTALLY INCREASE PWR, VICE VERSA
+              if(pivoR.getCurrentPosition() < (refPos - 500) || pivoR.getCurrentPosition() > refPos){
+                  pivoR.setPower(0);
+                  pivoL.setPower(0);
+              }
+          }
+
+          if(stoneToggle.update(gamepad2.x)){
+              stoneL.setPosition(0.7);
+              stoneR.setPosition(0.3);
+          } else {
+              stoneL.setPosition(0.55);
+              stoneR.setPosition(0.45);
           }
         }
     }
@@ -133,5 +177,15 @@ public class MainTeleOp extends LinearOpMode {
             swingR.setPosition(0.6);
         }
         telemetry.update();
+    }
+
+    public double maxabs(double in, double lim){
+        if(in < -lim){
+            return -lim;
+        }
+        if (in > lim){
+            return lim;
+        }
+        return in;
     }
 }
