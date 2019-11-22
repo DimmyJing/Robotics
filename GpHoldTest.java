@@ -89,7 +89,9 @@ public class GpTest extends LinearOpMode {
         refPosArtic = articulating.getCurrentPosition() - 100;
         articulating.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         articulating.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        double refPosArtic = 110;
+        pivoR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pivoR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        double refPosArtic = 90;
         double refPos = pivoR.getCurrentPosition();
         telemetry.addData("articPos", articulating.getCurrentPosition());
 
@@ -98,23 +100,19 @@ public class GpTest extends LinearOpMode {
         while(opModeIsActive()){
 
             normalOps();
-            extension.setPower(-gamepad2.right_stick_y/2);
+            extension.setPower(-gamepad2.left_stick_y/2);
 
             //FLATTEN OUT ARTICULATING JOINT (currently too jitterry)
-            double error = Math.pow(((refPosArtic + (refPos - pivoR.getCurrentPosition())) - articulating.getCurrentPosition()), 3)/313;
-           // telemetry.addData("actPwr", maxabs(error, 0.4));
+            double error = Math.pow(((refPosArtic - (int)((refPos - pivoR.getCurrentPosition()) * 228/2240)) - articulating.getCurrentPosition()),3)/313;
+            telemetry.addData("actPwr", maxabs(error, 0.3));
             if(autoAdjToggle.update(gamepad2.left_bumper)){
-            if(articulating.getCurrentPosition() > (refPosArtic + 5)){
-                articulating.setPower(-1);
+            if(articulating.getCurrentPosition() > (refPosArtic)){
+                articulating.setPower(-0.7);
             } else {
-                articulating.setPower(maxabs(error, 0.4));
+                articulating.setPower(maxabs(error, 0.3));
             }
             } else {
-                if(gamepad2.right_trigger > 0){
-                articulating.setPower(gamepad2.right_trigger/2);
-                } else {
-                    articulating.setPower(-gamepad2.left_trigger/2);
-                }
+                articulating.setPower(-gamepad2.right_stick_y/2.5);
             }
 
             telemetry.addData("Encoder pos pivo", pivoR.getCurrentPosition());
@@ -123,19 +121,19 @@ public class GpTest extends LinearOpMode {
             boolean motionAllowed = false;
             //WHEN A IS BEING HELD, DO NOT UPDATE POWER - HOLD @ WHATEVER WAS LAST ASSIGNED
             if(pivoR.getCurrentPosition() < (refPos - 500)){
-                if(gamepad1.right_stick_y < 0){
+                if(gamepad1.right_stick_y > 0){
                     motionAllowed = true;
                 }
             } else if (pivoR.getCurrentPosition() > refPos){
-                if(gamepad1.right_stick_y > 0){
+                if(gamepad1.right_stick_y < 0){
                     motionAllowed = true;
                 }
             } else {
                 motionAllowed = true;
             }
             if(motionAllowed){
-            pivoR.setPower(-gamepad1.right_stick_y/2.8);
-            pivoL.setPower(gamepad1.right_stick_y/2.8);
+            pivoR.setPower(gamepad1.right_stick_y/2.8);
+            pivoL.setPower(-gamepad1.right_stick_y/2.8);
             } else {
                 pivoR.setPower(0);
                 pivoL.setPower(0);
@@ -143,7 +141,7 @@ public class GpTest extends LinearOpMode {
           } else {
               //CODE TO CONFORM TO WHATEVER INITIAL POSITION IS
               // GET INITIAL POSITION ONCE, IF ENCODER GOES BELOW THEN INCREMENTALLY INCREASE PWR, VICE VERSA
-              if(pivoR.getCurrentPosition() < (refPos - 500) || pivoR.getCurrentPosition() > refPos){
+              if(pivoR.getCurrentPosition() < (refPos - 500) || pivoR.getCurrentPosition() > (refPos + 5)){
                   pivoR.setPower(0);
                   pivoL.setPower(0);
               }
@@ -154,8 +152,8 @@ public class GpTest extends LinearOpMode {
               stoneR.setPosition(0.05);
               telemetry.addData("stone", "active");
           } else {
-              stoneL.setPosition(0.3);
-              stoneR.setPosition(0.25);
+              stoneL.setPosition(0.35);
+              stoneR.setPosition(0.2);
               telemetry.addData("stone", "disabled");
           }
         }
@@ -164,28 +162,24 @@ public class GpTest extends LinearOpMode {
     public void normalOps() {
         in[0] = gamepad1.left_stick_x;
         in[1] = gamepad1.left_stick_y;
-
+        double div = 1;
         boolean precise = powerToggle.update(gamepad1.right_bumper);
+        if(precise){
+            div = 4;
+        } else {
+            div = 1;
+        }
 
         if (gamepad1.right_trigger + gamepad1.left_trigger > 0){
-            FL.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-            BL.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-            FR.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-            BR.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+            FL.setPower((gamepad1.right_trigger - gamepad1.left_trigger)/div);
+            BL.setPower((gamepad1.right_trigger - gamepad1.left_trigger)/div);
+            FR.setPower((gamepad1.right_trigger - gamepad1.left_trigger)/div);
+            BR.setPower((gamepad1.right_trigger - gamepad1.left_trigger)/div);
         } else {
-            if(precise){
-                telemetry.addData("Drive Mode: ", "PRECISION");
-                FL.setPower((in[0] - in[1])/4);
-                FR.setPower((in[0] + in[1])/4);
-                BL.setPower((-in[0] - in[1])/4);
-                BR.setPower((-in[0] + in[1])/4);
-            } else {
-                telemetry.addData("Drive Mode: ", "SPEED");
-                FL.setPower(in[0] - in[1]);
-                FR.setPower((in[0] + in[1]));
-                BL.setPower((-in[0] - in[1]));
-                BR.setPower((-in[0] + in[1]));
-            }
+                FL.setPower((in[0] - in[1])/(div * 1.15));
+                FR.setPower((in[0] + in[1])/(div * 1.15));
+                BL.setPower((-in[0] - in[1])/div);
+                BR.setPower((-in[0] + in[1])/div);
         }
         if (servoToggle.update(gamepad1.left_bumper)) {
             telemetry.addData("Servo Position: ", "DOWN");
