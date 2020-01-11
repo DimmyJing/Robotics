@@ -8,15 +8,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import static java.lang.System.currentTimeMillis;
 
-@Autonomous(name="FoundationRed", group="Linear Opmode")
-public class FoundationRed extends LinearOpMode {
+@Autonomous(name="FoundationBlue", group="Linear Opmode")
+public class FoundationBlue extends LinearOpMode {
     private final int TOLERANCE = 10;
 
     private DcMotor FL, FR, BL, BR, pivotL, pivotR, extension, articulating;
     private DcMotor[] drives;
 
     private Servo swingL, swingR, stoneL, stoneR;
-
+    // Vidith I'm watching you
     private double[] getPowers(double x, double y) {
         return new double[]{x - y, x + y, -x - y, -x + y};
     }
@@ -124,16 +124,16 @@ public class FoundationRed extends LinearOpMode {
         waitForStart();
 
         moveRev(5, 0, -1);
-        rotateRev(1, true, 0.3);
+        rotateRev(1, false, 0.3);
         moveRev(2, 0, -1);
         setFoundationServo(true);
         sleep(1000);
         moveRev(1, 0, 1);
-        rotateRev(1, true, 0.3);
+        rotateRev(1, false, 0.3);
         moveRev(4, 0, -1);
         setFoundationServo(false);
         sleep(1000);
-        rotateRev(1, false, 0.3);
+        rotateRev(1, true, 0.3);
         moveRev(4.2, 0, 1);
     }
 }
